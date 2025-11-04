@@ -39,6 +39,9 @@ namespace Portfolio_Api.Controllers
             
             var response = await userbll.ValidateLoginAsync(request);
 
+            if (!response.Success)
+                return BadRequest(response);
+
             return Ok(response);
         }
 
@@ -50,6 +53,9 @@ namespace Portfolio_Api.Controllers
 
             
             var response = await userbll.LogoutUserAsync(request);
+
+            if (!response.Success)
+                return BadRequest(response);
 
             return Ok(response);
         }
@@ -63,8 +69,26 @@ namespace Portfolio_Api.Controllers
 
             var response = await userbll.DeleteUserAsync(request);
 
+            if (!response.Success)
+                return BadRequest(response);
+
             return Ok(response);
         }
+
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(new { success = false, message = "Invalid request data" });
+
+            var response = await userbll.ChangePasswordAsync(request);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
 
     }
 

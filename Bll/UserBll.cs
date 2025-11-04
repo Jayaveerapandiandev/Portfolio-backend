@@ -242,6 +242,67 @@ namespace Portfolio_Api.Bll
             return response;
         }
 
+        public async Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            var response = new ChangePasswordResponse();
+
+            try
+            {
+                // 1️⃣ Check if user exists
+                string checkSql = @"SELECT password_hash FROM app_users WHERE user_id = @uid;";
+                var dt = await _db.ExecuteQueryAsync(checkSql, new NpgsqlParameter("@uid", request.UserId));
+
+                if (dt.Rows.Count == 0)
+                {
+                    response.Success = false;
+                    response.Message = "User not found.";
+                    return response;
+                }
+
+                // 2️⃣ Validate old password
+                string storedHash = dt.Rows[0]["password_hash"].ToString();
+                bool isOldPasswordValid = _hashing.VerifyPassword(request.OldPassword, storedHash);
+
+                if (!isOldPasswordValid)
+                {
+                    response.Success = false;
+                    response.Message = "Old password is incorrect.";
+                    return response;
+                }
+
+                // 3️⃣ Hash new password
+                string newHashedPassword = _hashing.HashPassword(request.NewPassword);
+
+                // 4️⃣ Update in DB
+                string updateSql = @"UPDATE app_users 
+                             SET password_hash = @newPwd, updated_at = NOW() 
+                             WHERE user_id = @uid;";
+
+                var parameters = new[]
+                {
+                    new NpgsqlParameter("@newPwd", newHashedPassword),
+                    new NpgsqlParameter("@uid", request.UserId)
+                };
+
+                int rowsAffected = await _db.ExecuteNonQueryAsync(updateSql, parameters);
+
+                // 5️⃣ Response
+                response.Success = rowsAffected > 0;
+                response.UpdatedAt = rowsAffected > 0 ? DateTime.UtcNow : null;
+                response.Message = rowsAffected > 0
+                    ? "Password changed successfully."
+                    : "Password change failed.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error: {ex.Message}";
+            }
+
+            return response;
+        }
+
+
     }
-    
+
 }
