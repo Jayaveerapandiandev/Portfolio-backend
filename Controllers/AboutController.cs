@@ -1,39 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
-using Portfolio_Api.DTO.Response;
 
 namespace Portfolio_Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-     
-    public class AdminController : ControllerBase
+    public class AboutController : ControllerBase
     {
-        AdminHomeBLL adminhome = new AdminHomeBLL();
-        [HttpPost("Save")]
-        public async Task<ActionResult<SaveAdminHomeResponse>> SaveHome([FromBody] SaveAdminHomeRequest request)
+        AboutBLL aboutbll = new AboutBLL();
+
+        [HttpPost("save")]
+        public async Task<IActionResult> SaveAbout([FromBody] AboutRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid request data" });
 
-            var result = await adminhome.SaveAdminHomeAsync(request);
-            if (!result.Success)
-                return BadRequest(result);
+            var response = await aboutbll.SaveAboutAsync(request);
+            if (!response.Success)
+                return BadRequest(response);
 
-            return Ok(result);
+            return Ok(response);
         }
-        [HttpGet("Get")]
-        public async Task<IActionResult> Get()
+
+        [HttpGet("get")]
+        public async Task<IActionResult> GetAbout()
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid request data" });
 
-            var response = await adminhome.GetAdminHomeAsync();
+            var response = await aboutbll.GetAboutAsync();
             if (!response.Success)
                 return BadRequest(response);
 
             return Ok(response);
         }
     }
+
 }
