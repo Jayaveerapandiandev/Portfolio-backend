@@ -42,6 +42,20 @@ namespace Portfolio_Api.Data
             return await cmd.ExecuteNonQueryAsync();
         }
 
+        // Execute INSERT with RETURNING id
+        public async Task<object?> ExecuteScalarAsync(string query, params NpgsqlParameter[] parameters)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var cmd = new NpgsqlCommand(query, connection);
+            if (parameters != null)
+                cmd.Parameters.AddRange(parameters);
+
+            return await cmd.ExecuteScalarAsync();
+        }
+
+
         public void Dispose()
         {
             // Nothing to dispose now - connections are disposed per-method
