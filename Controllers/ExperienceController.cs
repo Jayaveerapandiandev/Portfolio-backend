@@ -80,6 +80,18 @@ namespace Portfolio_Api.Controllers
             return Ok(result);
         }
 
+        // 🔹 DELETE /api/Experience/deletePosition/{experienceId}
+        [HttpDelete("deletePosition/{experienceId}")]
+        public async Task<IActionResult> DeleteExperiencePosition(int experienceId)
+        {
+            var result = await _bll.DeleteExperienceByIdAsync(experienceId);
+
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
+        }
+
 
     }
 }

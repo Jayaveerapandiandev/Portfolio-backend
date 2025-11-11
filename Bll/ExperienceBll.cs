@@ -71,13 +71,20 @@ namespace Portfolio_Api.Bll
 
                     if (row["experience_id"] != DBNull.Value)
                     {
+                        string? startDateStr = row["start_date"] != DBNull.Value
+                           ? Convert.ToDateTime(row["start_date"]).ToString("dd-MM-yyyy")
+                           : null;
+
+                        string? endDateStr = row["end_date"] != DBNull.Value
+                            ? Convert.ToDateTime(row["end_date"]).ToString("dd-MM-yyyy")
+                            : null;
                         var experience = new ExperienceDetailData
                         {
                             Id = Convert.ToInt32(row["experience_id"]),
                             Designation = row["designation"]?.ToString() ?? "",
                             PositionTitle = row["position_title"]?.ToString(),
-                            StartDate = Convert.ToDateTime(row["start_date"]),
-                            EndDate = row["end_date"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(row["end_date"]),
+                            StartDate = startDateStr,
+                            EndDate = endDateStr,
                             IsCurrentCompany = Convert.ToBoolean(row["is_current_company"]),
                             Description = row["description"]?.ToString(),
                             TechnologiesUsed = row["technologies_used"]?.ToString()
@@ -334,6 +341,62 @@ namespace Portfolio_Api.Bll
                 response.Success = false;
                 response.Message = $"Unexpected error: {ex.Message}";
                 response.DeletedCompanyId = null;
+            }
+
+            return response;
+        }
+
+        public async Task<DeleteExperienceResponse> DeleteExperienceByIdAsync(int experienceId)
+        {
+            var response = new DeleteExperienceResponse();
+
+            if (experienceId <= 0)
+            {
+                response.Success = false;
+                response.Message = "Invalid experience ID.";
+                response.Data = null;
+                return response;
+            }
+
+            try
+            {
+                using var db = new DatabaseHelper();
+
+                // 🔹 Check if experience exists
+                string checkQuery = "SELECT COUNT(*) FROM experiences WHERE id = @id;";
+                var countResult = await db.ExecuteScalarAsync(checkQuery, new NpgsqlParameter("@id", experienceId));
+                int count = Convert.ToInt32(countResult);
+
+                if (count == 0)
+                {
+                    response.Success = false;
+                    response.Message = "Experience not found.";
+                    response.Data = null;
+                    return response;
+                }
+
+                // 🔹 Delete the experience record
+                string deleteQuery = "DELETE FROM experiences WHERE id = @id;";
+                await db.ExecuteNonQueryAsync(deleteQuery, new NpgsqlParameter("@id", experienceId));
+
+                response.Success = true;
+                response.Message = "Experience position deleted successfully";
+                response.Data = new DeletedExperienceData
+                {
+                    ExperienceId = experienceId
+                };
+            }
+            catch (NpgsqlException ex)
+            {
+                response.Success = false;
+                response.Message = $"Database error while deleting experience: {ex.Message}";
+                response.Data = null;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Unexpected error: {ex.Message}";
+                response.Data = null;
             }
 
             return response;
