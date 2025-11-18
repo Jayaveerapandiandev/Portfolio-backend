@@ -5,7 +5,7 @@ using Portfolio_Api.DTO.Request;
 namespace Portfolio_Api.Controllers
 {
     [ApiController]
-    [Route("Messages")]
+    [Route("api/[controller]")]
     public class MessagesController : ControllerBase
     {
         MessageBLL _bll = new MessageBLL();
