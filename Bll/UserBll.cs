@@ -1,8 +1,10 @@
-﻿using Npgsql;
+﻿using Microsoft.Extensions.Configuration;
+using Npgsql;
 using NpgsqlTypes;
 using Portfolio_Api.Data;
 using Portfolio_Api.DTO.Request;
 using Portfolio_Api.DTO.Response;
+using Portfolio_Api.Services;
 using Portfolio_Api.Utilities;
 using System.Data;
 
@@ -13,14 +15,17 @@ namespace Portfolio_Api.Bll
         private readonly DatabaseHelper _db;
         private readonly AesCryptoService _crypto;
         private readonly HashingService _hashing;
+        private readonly IJwtService _jwtService;
 
-        public UserBLL()
+        public UserBLL(IConfiguration configuration)
         {
-            // DatabaseHelper automatically reads from AppConfig
             _db = new DatabaseHelper();
             _crypto = new AesCryptoService();
             _hashing = new HashingService();
+            _jwtService = new JwtService(configuration); // 🔹 Initialize JWT service
         }
+
+
 
         public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest request)
         {
@@ -135,10 +140,11 @@ namespace Portfolio_Api.Bll
                     };
                     sessionResult = await _db.ExecuteQueryAsync(insertSql, insertParams);
                 }
-
+                string token = _jwtService.GenerateToken(request.UserId, userName);
                 // 4️⃣ Prepare success response
                 response.Success = true;
                 response.Message = "Login successful.";
+                response.Token = token;
                 response.SessionId = sessionResult.Rows[0]["session_id"].ToString();
                 response.UserId = request.UserId;
                 response.username = userName; // 📌 Set the username

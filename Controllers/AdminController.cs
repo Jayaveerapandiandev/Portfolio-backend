@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
 using Portfolio_Api.DTO.Response;
@@ -11,6 +12,8 @@ namespace Portfolio_Api.Controllers
     public class AdminController : ControllerBase
     {
         AdminHomeBLL adminhome = new AdminHomeBLL();
+
+        [Authorize]
         [HttpPost("Save")]
         public async Task<ActionResult<SaveAdminHomeResponse>> SaveHome([FromBody] SaveAdminHomeRequest request)
         {

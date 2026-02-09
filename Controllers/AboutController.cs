@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
 
@@ -10,6 +11,7 @@ namespace Portfolio_Api.Controllers
     {
         AboutBLL aboutbll = new AboutBLL();
 
+        [Authorize]
         [HttpPost("save")]
         public async Task<IActionResult> SaveAbout([FromBody] AboutRequest request)
         {

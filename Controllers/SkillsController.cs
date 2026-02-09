@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
 
@@ -24,6 +25,7 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("AddNewSkill")]
         public async Task<IActionResult> Create([FromBody] CreateSkillRequest request)
         {
@@ -38,6 +40,7 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPut("UpdateSkills/{id}")]
         public async Task<IActionResult> UpdateSkill(int id, [FromBody] UpdateSkillRequest request)
         {
@@ -52,7 +55,7 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
-
+        [Authorize]
         [HttpDelete("deleteSkill/{id}")]
         public async Task<IActionResult> DeleteSkill(int id)
         {

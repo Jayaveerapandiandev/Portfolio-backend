@@ -1,13 +1,11 @@
 ﻿using global::Portfolio_Api.Bll;
 using global::Portfolio_Api.DTO.Request;
 using global::Portfolio_Api.DTO.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Portfolio_Api.Controllers
 {
-    
-
-   
     
         [Route("api/[controller]")]
         [ApiController]
@@ -20,6 +18,7 @@ namespace Portfolio_Api.Controllers
                 _bll = new ExperienceBLL();
             }
 
+        [Authorize]
         [HttpPost("add")]
         public async Task<IActionResult> AddExperience([FromBody] AddExperienceRequest request)
         {
@@ -49,6 +48,7 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("addForExistingCompany")]
         public async Task<IActionResult> AddExperienceForExistingCompany([FromBody] AddExperienceForExistingCompanyRequest req)
         {
@@ -69,6 +69,7 @@ namespace Portfolio_Api.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpDelete("delete/{companyId}")]
         public async Task<IActionResult> DeleteCompany(int companyId)
         {
@@ -81,6 +82,7 @@ namespace Portfolio_Api.Controllers
         }
 
         // 🔹 DELETE /api/Experience/deletePosition/{experienceId}
+        [Authorize]
         [HttpDelete("deletePosition/{experienceId}")]
         public async Task<IActionResult> DeleteExperiencePosition(int experienceId)
         {

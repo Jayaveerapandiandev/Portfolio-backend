@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
 
@@ -10,6 +11,7 @@ namespace Portfolio_Api.Controllers
     {
         MessageBLL _bll = new MessageBLL();
 
+        //[Authorize]
         [HttpPost("create")]
         public async Task<IActionResult> CreateMessage([FromBody] CreateMessageRequest request)
         {
@@ -48,6 +50,7 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteMessage(int id)
         {

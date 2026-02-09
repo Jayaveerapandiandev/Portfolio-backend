@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
 using Portfolio_Api.DTO.Response;
@@ -9,7 +10,15 @@ namespace Portfolio_Api.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        UserBLL userbll = new UserBLL();
+        private readonly IConfiguration _configuration;
+        private readonly UserBLL _userbll; // 🔹 Make it a field
+
+        public UserController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _userbll = new UserBLL(_configuration); // 🔹 Initialize with configuration
+        }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
         {
@@ -22,7 +31,7 @@ namespace Portfolio_Api.Controllers
                 });
             }
 
-            var response = await userbll.CreateUserAsync(request);
+            var response = await _userbll.CreateUserAsync(request);
 
             if (!response.Success)
                 return BadRequest(response);
@@ -36,8 +45,7 @@ namespace Portfolio_Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid request data" });
 
-            
-            var response = await userbll.ValidateLoginAsync(request);
+            var response = await _userbll.ValidateLoginAsync(request); // 🔹 Use _userbll
 
             if (!response.Success)
                 return BadRequest(response);
@@ -45,14 +53,14 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid request data" });
 
-            
-            var response = await userbll.LogoutUserAsync(request);
+            var response = await _userbll.LogoutUserAsync(request);
 
             if (!response.Success)
                 return BadRequest(response);
@@ -60,14 +68,14 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("Delete")]
-        public async Task<IActionResult> delete([FromBody] DeleteUserRequest request)
+        public async Task<IActionResult> Delete([FromBody] DeleteUserRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid request data" });
 
-
-            var response = await userbll.DeleteUserAsync(request);
+            var response = await _userbll.DeleteUserAsync(request);
 
             if (!response.Success)
                 return BadRequest(response);
@@ -75,22 +83,19 @@ namespace Portfolio_Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Invalid request data" });
 
-            var response = await userbll.ChangePasswordAsync(request);
+            var response = await _userbll.ChangePasswordAsync(request);
 
             if (!response.Success)
                 return BadRequest(response);
 
             return Ok(response);
         }
-
-
     }
-
-
 }

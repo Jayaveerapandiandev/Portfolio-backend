@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio_Api.Bll;
 using Portfolio_Api.DTO.Request;
 
@@ -23,6 +24,7 @@ namespace Portfolio_Api.Controllers
            
         }
 
+        [Authorize]
         [HttpPost("add")]
         public async Task<IActionResult> AddProject([FromBody] ProjectRequest req)
         {
@@ -36,6 +38,7 @@ namespace Portfolio_Api.Controllers
           
         }
 
+        [Authorize]
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateProject(int id, [FromBody] ProjectRequest req)
         {
@@ -50,6 +53,7 @@ namespace Portfolio_Api.Controllers
            
         }
 
+        [Authorize]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteProject(int id)
         {
