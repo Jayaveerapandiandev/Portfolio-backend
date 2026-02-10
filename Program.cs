@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("https://jayaveerapandianportfolio-7g2oyz1m0.vercel.app")
+            policy.WithOrigins("https://portfolioproduction-git-main-jayaveerapandian-ss-projects.vercel.app")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
